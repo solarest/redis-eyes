@@ -1,4 +1,4 @@
-package com.solarest.rediseyes.client;
+package com.solarest.rediseyes.client.ops;
 
 /**
  * Created by JinJian on 17-7-28.

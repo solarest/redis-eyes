@@ -2,6 +2,7 @@ package com.solarest.rediseyes.client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import java.util.LinkedHashMap;
@@ -15,18 +16,24 @@ public class RedisClientContainer {
 
     private final Logger logger = LoggerFactory.getLogger(RedisClientContainer.class);
 
-    public RedisClientContainer() {
-    }
-
     private LinkedHashMap<String, JedisPool> redisClients;
+
+    public RedisClientContainer() {
+        this.redisClients = new LinkedHashMap<>();
+    }
 
     public synchronized JedisPool getRedisClient(String connInfo) {
         return redisClients.get(connInfo);
     }
 
+    public Jedis getJedisResource(String connInfo) {
+        JedisPool jedisPool = this.getRedisClient(connInfo);
+        return jedisPool.getResource();
+    }
+
     public void addRedisClient(String connInfo, JedisPool pool) {
         redisClients.put(connInfo, pool);
-        logger.info("add to the RedisClientContainer success, connection info: " + connInfo);
+        logger.info("add to the RedisClientContainer success, connection info is: " + connInfo);
     }
 
     public void removeClient(String connInfo) {

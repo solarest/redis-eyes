@@ -1,6 +1,8 @@
 package com.solarest.rediseyes.client;
 
 import com.alibaba.fastjson.JSONObject;
+import com.solarest.rediseyes.client.ops.ContainerAddOps;
+import com.solarest.rediseyes.client.ops.ContainerRemoveOps;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
