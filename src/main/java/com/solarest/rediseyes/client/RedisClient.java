@@ -1,5 +1,6 @@
 package com.solarest.rediseyes.client;
 
+import com.alibaba.fastjson.JSONObject;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -14,6 +15,8 @@ public class RedisClient implements Serializable {
 
     private static JedisPool jedisPool = null;
 
+    private static String connInfo = null;
+
     /**
      * create redisPool
      *
@@ -21,7 +24,13 @@ public class RedisClient implements Serializable {
      */
     public static JedisPool initPool(String host, Integer port, String pwd) {
         if (jedisPool == null) {
-            ContainerAddOps addOps = new ContainerAddOps() {
+
+            JSONObject infoJson = new JSONObject();
+            infoJson.put("host", host);
+            infoJson.put("port", port);
+            connInfo = infoJson.toJSONString();
+
+            new ContainerAddOps() {
                 @Override
                 public void initPool() {
                     JedisPoolConfig config = new JedisPoolConfig();
@@ -33,8 +42,9 @@ public class RedisClient implements Serializable {
                 }
 
                 @Override
-                public void addContainer(String connInfo) {
-
+                public void addClient() {
+                    RedisClientContainer clientContainer = SingletonContainer.getSingleton();
+                    clientContainer.addRedisClient(connInfo, jedisPool);
                 }
             };
         }
@@ -74,6 +84,17 @@ public class RedisClient implements Serializable {
      * distory the jedisPool
      */
     public static void destoryPool() {
-        jedisPool.close();
+        new ContainerRemoveOps() {
+            @Override
+            public void destroyPool() {
+                jedisPool.close();
+            }
+
+            @Override
+            public void removeClient() {
+                RedisClientContainer clientContainer = SingletonContainer.getSingleton();
+                clientContainer.removeClient(connInfo);
+            }
+        };
     }
 }

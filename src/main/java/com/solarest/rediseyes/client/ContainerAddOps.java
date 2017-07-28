@@ -11,9 +11,8 @@ public interface ContainerAddOps {
     void initPool();
 
     /**
-     * add to container and add connInfo
-     * @param connInfo
+     * add to container & add connInfo
      */
-    void addContainer(String connInfo);
+    void addClient();
 
 }
