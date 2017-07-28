@@ -4,8 +4,6 @@ import com.solarest.rediseyes.client.SingletonContainer;
 import com.solarest.rediseyes.service.ListOpsService;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-
 /**
  * Created by JinJian on 17-7-28.
  */
