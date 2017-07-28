@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 /**
  * Created by JinJian on 17-7-28.
  * The container with redis connection pools.
- * Must be Singleton
+ * Must be the Singleton
  */
 public class RedisClientContainer {
 

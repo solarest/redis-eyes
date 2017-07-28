@@ -81,7 +81,7 @@ public class RedisClient implements Serializable {
     }
 
     /**
-     * distory the jedisPool
+     * destroy the jedisPool
      */
     public static void destoryPool() {
         new ContainerRemoveOps() {
