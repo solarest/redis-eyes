@@ -25,13 +25,6 @@ public class ListOpsServiceImpl implements ListOpsService {
     }
 
     @Override
-    public void removeList(String connInfo, String... k) {
-        SingletonContainer.getSingleton()
-                .getJedisResource(connInfo)
-                .del(k);
-    }
-
-    @Override
     public String leftPop(String connInfo, String k) {
         return SingletonContainer.getSingleton()
                 .getJedisResource(connInfo)

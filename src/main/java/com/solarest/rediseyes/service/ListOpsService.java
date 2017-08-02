@@ -10,8 +10,6 @@ public interface ListOpsService {
 
     void rightPush(String connInfo, String k, String... v);
 
-    void removeList(String connInfo, String... k);
-
     String leftPop(String connInfo, String k);
 
     String rightPop(String connInfo, String k);

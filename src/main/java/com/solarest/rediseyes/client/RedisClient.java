@@ -1,8 +1,6 @@
 package com.solarest.rediseyes.client;
 
 import com.alibaba.fastjson.JSONObject;
-import com.solarest.rediseyes.client.ops.ContainerAddOps;
-import com.solarest.rediseyes.client.ops.ContainerRemoveOps;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -15,42 +13,44 @@ import java.io.Serializable;
  */
 public class RedisClient implements Serializable {
 
-    private static JedisPool jedisPool = null;
+    private String host;
 
-    private static String connInfo = null;
+    private Integer port;
+
+    private String password;
+
+    private JedisPool jedisPool;
+
+    public RedisClient(String host, Integer port, String password) {
+        this.host = host;
+        this.port = port;
+        this.password = password;
+        this.createPool(host, port, password);
+    }
+
+    public JSONObject getClientInfo() {
+        JSONObject json = new JSONObject();
+        json.put("host", host);
+        json.put("port", port);
+        return json;
+    }
 
     /**
      * create redisPool
      *
      * @return JedisPool
      */
-    public static JedisPool initPool(String host, Integer port, String pwd) {
-        if (jedisPool == null) {
-
-            JSONObject infoJson = new JSONObject();
-            infoJson.put("host", host);
-            infoJson.put("port", port);
-            connInfo = infoJson.toJSONString();
-
-            new ContainerAddOps() {
-                @Override
-                public void initPool() {
-                    JedisPoolConfig config = new JedisPoolConfig();
-                    config.setTestOnBorrow(true);
-                    config.setMaxIdle(5);       // the max amount of jedis instance in `idle` status
-                    config.setMaxTotal(100);    // the max amount of jedis instance in `active` status
-                    config.setMaxWaitMillis(100 * 1000);
-                    jedisPool = new JedisPool(config, host, port, 5 * 1000, pwd);
-                }
-
-                @Override
-                public void addClient() {
-                    RedisClientContainer clientContainer = SingletonContainer.getSingleton();
-                    clientContainer.addRedisClient(connInfo, jedisPool);
-                }
-            };
+    public void createPool(String host, Integer port, String password) {
+        JedisPoolConfig config = new JedisPoolConfig();
+        config.setTestOnBorrow(true);
+        config.setMaxIdle(5);       // the max amount of jedis instance in `idle` status
+        config.setMaxTotal(100);    // the max amount of jedis instance in `active` status
+        config.setMaxWaitMillis(100 * 1000);
+        if (password != null && !"".equals(password)) {
+            this.jedisPool = new JedisPool(config, host, port, 5 * 1000, password);
+        } else {
+            this.jedisPool = new JedisPool(config, host, port, 5 * 1000);
         }
-        return jedisPool;
     }
 
     /**
@@ -58,7 +58,7 @@ public class RedisClient implements Serializable {
      *
      * @return jedis instance
      */
-    public synchronized static Jedis getResource() {
+    public synchronized Jedis getResource() {
         try {
             if (jedisPool != null) {
                 return jedisPool.getResource();
@@ -76,7 +76,7 @@ public class RedisClient implements Serializable {
      *
      * @param jedis jedis instance
      */
-    public static void releaseResource(Jedis jedis) {
+    public void releaseResource(Jedis jedis) {
         if (jedis != null) {
             jedis.close();
         }
@@ -85,18 +85,8 @@ public class RedisClient implements Serializable {
     /**
      * destroy the jedisPool
      */
-    public static void destoryPool() {
-        new ContainerRemoveOps() {
-            @Override
-            public void destroyPool() {
-                jedisPool.close();
-            }
-
-            @Override
-            public void removeClient() {
-                RedisClientContainer clientContainer = SingletonContainer.getSingleton();
-                clientContainer.removeClient(connInfo);
-            }
-        };
+    public void destoryPool() {
+        jedisPool.close();
     }
 }
+

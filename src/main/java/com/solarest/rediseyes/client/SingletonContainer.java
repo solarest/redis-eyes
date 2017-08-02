@@ -2,7 +2,7 @@ package com.solarest.rediseyes.client;
 
 /**
  * Created by JinJian on 17-7-28.
- * Singleton for RedisClient
+ * Singleton for RedisClientContainer
  */
 public class SingletonContainer {
 
