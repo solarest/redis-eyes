@@ -1,5 +1,7 @@
 package com.solarest.rediseyes.service;
 
+import com.solarest.rediseyes.exception.NonClientExcept;
+
 import java.util.List;
 
 /**
@@ -7,7 +9,5 @@ import java.util.List;
  */
 public interface ClientOpsService {
 
-    List<String> scanKeys(String conn, String pattern, Integer size);
-
-
+    List<String> scanKeys(String conn, String pattern, Integer cursor, Integer size) throws NonClientExcept;
 }
