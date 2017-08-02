@@ -10,7 +10,6 @@ public class JedisTest {
         Jedis client = new Jedis("localhost", 6379);
         ScanParams params = new ScanParams();
         params.count(100);
-        params.match("*/docid");
-        System.out.println(client.scan("0", params).getResult());
+        System.out.println(client.dbSize());
     }
 }

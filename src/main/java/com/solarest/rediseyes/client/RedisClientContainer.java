@@ -23,36 +23,43 @@ public class RedisClientContainer {
         this.redisClients = new LinkedHashMap<>();
     }
 
-    public synchronized RedisClient getRedisClient(String conn) {
-        return redisClients.get(conn);
+    public synchronized RedisClient getRedisClient(String conn) throws NonClientExcept {
+        RedisClient client = redisClients.get(conn);
+        if (client == null)
+            throw new NonClientExcept(conn);
+        return client;
     }
 
     public Jedis getJedisResource(String conn) throws NonClientExcept {
         RedisClient client = this.getRedisClient(conn);
-        if (client == null)
-            throw new NonClientExcept(conn);
         return client.getResource();
     }
 
     public synchronized void addRedisClient(RedisClient client) {
-        redisClients.put(client.getClientInfo(), client);
-        logger.info("add to the redis client container success, connection is: " + client.getClientInfo());
+        if (redisClients.containsKey(client.getClientInfo())) {
+            logger.info("This client has been existed!");
+        } else {
+            redisClients.put(client.getClientInfo(), client);
+            logger.info("Add the redis client into container successfully, connection is: " + client.getClientInfo());
+        }
     }
 
-    public void removeClient(RedisClient client) {
+    public synchronized void removeClient(RedisClient client) {
         if (redisClients.containsKey(client.getClientInfo())) {
+            client.destroyPool();
             redisClients.remove(client.getClientInfo());
-            logger.info("Remove from the redis client container success, connection is: " + client.getClientInfo());
         } else {
             logger.warn("This redis client is not exist!");
         }
     }
 
-    public void removeClient(String host, Integer port) {
+    public synchronized void removeClient(String host, Integer port) {
         String conn = host + ":" + String.valueOf(port);
         if (redisClients.containsKey(conn)) {
+            RedisClient client = redisClients.get(conn);
+            client.destroyPool();
             redisClients.remove(conn);
-            logger.info("Remove from the redis client container success, connection is: " + conn);
+            logger.info("Remove the redis client from container successfully, connection is: " + conn);
         } else {
             logger.warn("This redis client is not exist!");
         }

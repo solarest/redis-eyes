@@ -6,6 +6,6 @@ package com.solarest.rediseyes.exception;
 public class NonClientExcept extends Exception {
 
     public NonClientExcept(String conn) {
-        super("This redis client has not been initialed !; conn:" + conn);
+        super("This redis client has not been initialed !; connection is: " + conn);
     }
 }

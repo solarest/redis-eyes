@@ -1,6 +1,5 @@
 package com.solarest.rediseyes.client;
 
-import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -63,7 +62,7 @@ public class RedisClient implements Serializable {
         try {
             if (jedisPool != null) {
                 Jedis jedis = jedisPool.getResource();
-                logger.info("Get Jedis success! conn: " + getClientInfo());
+                logger.info("Get Jedis successfully! connection is: " + getClientInfo());
                 return jedis;
             } else {
                 return null;
@@ -82,13 +81,14 @@ public class RedisClient implements Serializable {
     public void releaseResource(Jedis jedis) {
         if (jedis != null) {
             jedis.close();
+            logger.info("Release Jedis successfully! connection is: " + getClientInfo());
         }
     }
 
     /**
      * destroy the jedisPool
      */
-    public void destoryPool() {
+    public void destroyPool() {
         jedisPool.close();
     }
 

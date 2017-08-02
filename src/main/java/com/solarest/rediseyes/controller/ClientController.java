@@ -1,5 +1,6 @@
 package com.solarest.rediseyes.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.solarest.rediseyes.client.RedisClient;
 import com.solarest.rediseyes.client.RedisClientContainer;
 import com.solarest.rediseyes.client.SingletonContainer;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 /**
  * Created by JinJian on 17-5-9.
@@ -54,6 +56,13 @@ public class ClientController {
             @RequestParam("start") Integer start,
             @RequestParam("size") Integer size
     ) throws NonClientExcept {
-        return clientOps.scanKeys(host + ":" + String.valueOf(port), pattern, start, size).toString();
+        JSONObject json = new JSONObject();
+        String conn = host + ":" + String.valueOf(port);
+        Integer count = clientOps.countKeys(conn);
+        List<String> keyList = clientOps.scanKeys(conn, pattern, start, size);
+        json.put("db_size", count);
+        json.put("key_size", keyList.size());
+        json.put("content", keyList);
+        return json.toString();
     }
 }
