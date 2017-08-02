@@ -28,11 +28,8 @@ public class RedisClient implements Serializable {
         this.createPool(host, port, password);
     }
 
-    public JSONObject getClientInfo() {
-        JSONObject json = new JSONObject();
-        json.put("host", host);
-        json.put("port", port);
-        return json;
+    public String getClientInfo() {
+        return host + ":" + String.valueOf(port);
     }
 
     /**
@@ -87,6 +84,22 @@ public class RedisClient implements Serializable {
      */
     public void destoryPool() {
         jedisPool.close();
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public JedisPool getJedisPool() {
+        return jedisPool;
     }
 }
 

@@ -33,23 +33,24 @@ public class RedisClientContainer {
     }
 
     public synchronized void addRedisClient(RedisClient client) {
-        redisClients.put(client.getClientInfo().toJSONString(), client);
-        logger.info("add to the redis client container success, connection is: " + client.getClientInfo().toJSONString());
+        redisClients.put(client.getClientInfo(), client);
+        logger.info("add to the redis client container success, connection is: " + client.getClientInfo());
     }
 
     public void removeClient(RedisClient client) {
-        if (redisClients.containsKey(client.getClientInfo().toJSONString()))
-            redisClients.remove(client.getClientInfo().toJSONString());
-        logger.info("Remove from the redis client container success, connection is: " + client.getClientInfo().toJSONString());
+        if (redisClients.containsKey(client.getClientInfo())) {
+            redisClients.remove(client.getClientInfo());
+            logger.info("Remove from the redis client container success, connection is: " + client.getClientInfo());
+        } else {
+            logger.warn("This redis client is not exist!");
+        }
     }
 
     public void removeClient(String host, Integer port) {
-        JSONObject json = new JSONObject();
-        json.put("host", host);
-        json.put("port", port);
-        if (redisClients.containsKey(json.toJSONString())) {
-            redisClients.remove(json.toJSONString());
-            logger.info("Remove from the redis client container success, connection is: " + json.toJSONString());
+        String conn = host + ":" + String.valueOf(port);
+        if (redisClients.containsKey(conn)) {
+            redisClients.remove(conn);
+            logger.info("Remove from the redis client container success, connection is: " + conn);
         } else {
             logger.warn("This redis client is not exist!");
         }
@@ -58,7 +59,9 @@ public class RedisClientContainer {
     public JSONObject reportContainStatus() {
         JSONObject json = new JSONObject();
         json.put("count", redisClients.size());
-        json.put("content", redisClients.keySet().stream().map(JSONObject::parseObject).collect(Collectors.toList()));
+        json.put("content", redisClients.keySet().stream()
+                .map(JSONObject::parseObject)
+                .collect(Collectors.toList()));
         return json;
     }
 }

@@ -11,30 +11,30 @@ import org.springframework.stereotype.Service;
 public class ListOpsServiceImpl implements ListOpsService {
 
     @Override
-    public void leftPush(String connInfo, String k, String... v) {
+    public void leftPush(String conn, String k, String... v) {
         SingletonContainer.getSingleton()
-                .getJedisResource(connInfo)
+                .getJedisResource(conn)
                 .lpush(k, v);
     }
 
     @Override
-    public void rightPush(String connInfo, String k, String... v) {
+    public void rightPush(String conn, String k, String... v) {
         SingletonContainer.getSingleton()
-                .getJedisResource(connInfo)
+                .getJedisResource(conn)
                 .rpush(k, v);
     }
 
     @Override
-    public String leftPop(String connInfo, String k) {
+    public String leftPop(String conn, String k) {
         return SingletonContainer.getSingleton()
-                .getJedisResource(connInfo)
+                .getJedisResource(conn)
                 .lpop(k);
     }
 
     @Override
-    public String rightPop(String connInfo, String k) {
+    public String rightPop(String conn, String k) {
         return SingletonContainer.getSingleton()
-                .getJedisResource(connInfo)
+                .getJedisResource(conn)
                 .rpop(k);
     }
 }

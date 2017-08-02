@@ -19,9 +19,10 @@ public class ClientController {
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
     public String login(
             @RequestParam("host") String host,
-            @RequestParam("port") Integer port
+            @RequestParam("port") Integer port,
+            String password
     ) {
-        RedisClient client = new RedisClient(host, port, null);
+        RedisClient client = new RedisClient(host, port, password);
         RedisClientContainer container = SingletonContainer.getSingleton();
         container.addRedisClient(client);
         return container.reportContainStatus().toString();
