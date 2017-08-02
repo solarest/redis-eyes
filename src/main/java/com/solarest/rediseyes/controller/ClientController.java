@@ -65,4 +65,18 @@ public class ClientController {
         json.put("content", keyList);
         return json.toString();
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/remove", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    public String removeKey(
+            @RequestParam("host") String host,
+            @RequestParam("port") Integer port,
+            @RequestParam("key") String key
+    ) throws NonClientExcept {
+        JSONObject json = new JSONObject();
+        String conn = host + ":" + String.valueOf(port);
+        clientOps.removeKeys(conn, key);
+        json.put("msg", "success");
+        return json.toString();
+    }
 }

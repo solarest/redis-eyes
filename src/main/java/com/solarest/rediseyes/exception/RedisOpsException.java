@@ -6,4 +6,8 @@ package com.solarest.rediseyes.exception;
  */
 public class RedisOpsException extends Exception {
 
+    public RedisOpsException(String conn, Exception e) {
+        super("This redis operation failed!; connection is: " + conn + "Exception: " + e.getMessage());
+    }
+
 }

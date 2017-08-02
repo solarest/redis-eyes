@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ScanParams;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,22 +20,21 @@ public class ClientOpsServiceImpl implements ClientOpsService {
     @Override
     public List<String> scanKeys(String conn, String pattern, Integer cursor, Integer size) throws NonClientExcept {
         Jedis jedis = null;
-        List<String> keys = new ArrayList<>();
+        List<String> keys;
         RedisClient client = SingletonContainer.getSingleton().getRedisClient(conn);
         try {
             jedis = client.getResource();
-            for (int i = 0; keys.size() < size; i++) {
-                ScanParams scanParams = new ScanParams().match(pattern).count((i + 1) * size);
-                List<String> scanKeys = jedis.scan(cursor + (i * size), scanParams).getResult();
-                for (String key : scanKeys) {
-                    if (keys.size() == size) break;
-                    keys.add(key);
-                }
-                if ((i + 1) * size >= countKeys(conn)) break;
+            if ("*".equals(pattern)) {
+                ScanParams scanParams = new ScanParams().match(pattern).count(countKeys(conn));
+                keys = jedis.scan(String.valueOf(cursor), scanParams).getResult();
+            } else {
+                ScanParams scanParams = new ScanParams().match(pattern).count(size);
+                keys = jedis.scan(String.valueOf(cursor), scanParams).getResult();
             }
         } finally {
             client.releaseResource(jedis);
         }
+        Collections.sort(keys);
         return keys;
     }
 
