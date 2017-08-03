@@ -1,5 +1,6 @@
 package com.solarest.rediseyes.client;
 
+import com.solarest.rediseyes.exception.NonClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -24,7 +25,7 @@ public class RedisClient implements Serializable {
 
     private final Logger logger = LoggerFactory.getLogger(RedisClient.class);
 
-    public RedisClient(String host, Integer port, String password) {
+    public RedisClient(String host, Integer port, String password) throws Exception {
         this.host = host;
         this.port = port;
         this.password = password;
@@ -40,7 +41,7 @@ public class RedisClient implements Serializable {
      *
      * @return JedisPool
      */
-    public void createPool(String host, Integer port, String password) {
+    public void createPool(String host, Integer port, String password) throws Exception {
         JedisPoolConfig config = new JedisPoolConfig();
         config.setTestOnBorrow(true);
         config.setMaxIdle(5);       // the max amount of jedis instance in `idle` status
@@ -51,6 +52,8 @@ public class RedisClient implements Serializable {
         } else {
             this.jedisPool = new JedisPool(config, host, port, 5 * 1000);
         }
+        if (!jedisPool.getResource().isConnected())
+            throw new NonClientException(this.getClientInfo());
     }
 
     /**

@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.solarest.rediseyes.client.RedisClient;
 import com.solarest.rediseyes.client.RedisClientContainer;
 import com.solarest.rediseyes.client.SingletonContainer;
-import com.solarest.rediseyes.exception.NonClientExcept;
+import com.solarest.rediseyes.exception.NonClientException;
 import com.solarest.rediseyes.service.ClientOpsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +14,11 @@ import java.util.List;
 
 /**
  * Created by JinJian on 17-5-9.
- * client controller
+ * routes on redis client operations
  */
 @RestController
 @RequestMapping("/client")
-public class ClientController {
+public class ClientController extends AbstractHandleController {
 
     @Autowired
     private ClientOpsService clientOps;
@@ -29,11 +29,11 @@ public class ClientController {
             @RequestParam("host") String host,
             @RequestParam("port") Integer port,
             String password
-    ) {
+    ) throws Exception {
         RedisClient client = new RedisClient(host, port, password);
         RedisClientContainer container = SingletonContainer.getSingleton();
         container.addRedisClient(client);
-        return container.reportContainStatus().toString();
+        return getJsonString(container.reportContainStatus());
     }
 
     @ResponseBody
@@ -44,7 +44,7 @@ public class ClientController {
     ) {
         RedisClientContainer container = SingletonContainer.getSingleton();
         container.removeClient(host, port);
-        return container.reportContainStatus().toString();
+        return getJsonString(container.reportContainStatus());
     }
 
     @ResponseBody
@@ -55,15 +55,26 @@ public class ClientController {
             @RequestParam("pattern") String pattern,
             @RequestParam("start") Integer start,
             @RequestParam("size") Integer size
-    ) throws NonClientExcept {
+    ) throws NonClientException {
         JSONObject json = new JSONObject();
-        String conn = host + ":" + String.valueOf(port);
-        Integer count = clientOps.countKeys(conn);
-        List<String> keyList = clientOps.scanKeys(conn, pattern, start, size);
+        Integer count = clientOps.countKeys(getClientInfo(host, port));
+        List<String> keyList = clientOps.scanKeys(getClientInfo(host, port), pattern, start, size);
         json.put("db_size", count);
         json.put("key_size", keyList.size());
         json.put("content", keyList);
-        return json.toString();
+        return getJsonString(json);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/type", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+    public String getKeyType(
+            @RequestParam("host") String host,
+            @RequestParam("port") Integer port,
+            @RequestParam("key") String key
+    ) throws NonClientException {
+        JSONObject json = new JSONObject();
+        clientOps.keyType(getClientInfo(host, port), key);
+        return getJsonString(json);
     }
 
     @ResponseBody
@@ -72,11 +83,9 @@ public class ClientController {
             @RequestParam("host") String host,
             @RequestParam("port") Integer port,
             @RequestParam("key") String key
-    ) throws NonClientExcept {
+    ) throws NonClientException {
         JSONObject json = new JSONObject();
-        String conn = host + ":" + String.valueOf(port);
-        clientOps.removeKeys(conn, key);
-        json.put("msg", "success");
-        return json.toString();
+        clientOps.removeKeys(getClientInfo(host, port), key);
+        return getJsonString(json);
     }
 }

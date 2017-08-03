@@ -1,7 +1,7 @@
 package com.solarest.rediseyes.client;
 
 import com.alibaba.fastjson.JSONObject;
-import com.solarest.rediseyes.exception.NonClientExcept;
+import com.solarest.rediseyes.exception.NonClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -23,14 +23,14 @@ public class RedisClientContainer {
         this.redisClients = new LinkedHashMap<>();
     }
 
-    public synchronized RedisClient getRedisClient(String conn) throws NonClientExcept {
+    public synchronized RedisClient getRedisClient(String conn) throws NonClientException {
         RedisClient client = redisClients.get(conn);
         if (client == null)
-            throw new NonClientExcept(conn);
+            throw new NonClientException(conn);
         return client;
     }
 
-    public Jedis getJedisResource(String conn) throws NonClientExcept {
+    public Jedis getJedisResource(String conn) throws NonClientException {
         RedisClient client = this.getRedisClient(conn);
         return client.getResource();
     }
