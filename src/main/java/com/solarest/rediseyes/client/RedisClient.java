@@ -10,7 +10,8 @@ import redis.clients.jedis.JedisPoolConfig;
 import java.io.Serializable;
 
 /**
- * Created by JinJian on 17-7-28.
+ * @author JinJian
+ * @date 17-7-28
  * redis connection pool
  */
 public class RedisClient implements Serializable {
@@ -41,19 +42,22 @@ public class RedisClient implements Serializable {
      *
      * @return JedisPool
      */
-    public void createPool(String host, Integer port, String password) throws Exception {
+    private void createPool(String host, Integer port, String password) throws Exception {
         JedisPoolConfig config = new JedisPoolConfig();
         config.setTestOnBorrow(true);
-        config.setMaxIdle(5);       // the max amount of jedis instance in `idle` status
-        config.setMaxTotal(100);    // the max amount of jedis instance in `active` status
+        // the max amount of jedis instance in `idle` status
+        config.setMaxIdle(5);
+        // the max amount of jedis instance in `active` status
+        config.setMaxTotal(100);
         config.setMaxWaitMillis(100 * 1000);
         if (password != null && !"".equals(password)) {
             this.jedisPool = new JedisPool(config, host, port, 5 * 1000, password);
         } else {
             this.jedisPool = new JedisPool(config, host, port, 5 * 1000);
         }
-        if (!jedisPool.getResource().isConnected())
+        if (!jedisPool.getResource().isConnected()) {
             throw new NonClientException(this.getClientInfo());
+        }
     }
 
     /**

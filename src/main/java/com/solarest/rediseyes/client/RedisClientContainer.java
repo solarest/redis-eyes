@@ -9,7 +9,8 @@ import redis.clients.jedis.Jedis;
 import java.util.LinkedHashMap;
 
 /**
- * Created by JinJian on 17-7-28.
+ * @author JinJian
+ * @date 17-7-28
  * The container with redis connection pools.
  * Must be the Singleton
  */
@@ -25,8 +26,9 @@ public class RedisClientContainer {
 
     public synchronized RedisClient getRedisClient(String conn) throws NonClientException {
         RedisClient client = redisClients.get(conn);
-        if (client == null)
+        if (client == null) {
             throw new NonClientException(conn);
+        }
         return client;
     }
 
