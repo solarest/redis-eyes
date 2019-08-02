@@ -2,7 +2,7 @@
 <Configuration status="off" monitorInterval="1800">
 
     <properties>
-        <property name="LOG_HOME">${catalina.home}/logs/icekredit</property>
+        <property name="LOG_HOME">${catalina.home}/logs/redis</property>
     </properties>
 
     <Appenders>
